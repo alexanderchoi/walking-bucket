@@ -16,8 +16,6 @@ router.get('/', (req, res) => {
 // @desc   Create An Item
 // @access Public
 router.post('/', (req, res) => {
-  console.log(`req body name is ${req.body.name}`);
-  
   const newItem = new Item({
     name: req.body.name
   });

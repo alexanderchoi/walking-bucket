@@ -2,11 +2,13 @@ const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 
+
+
 const items = require('./routes/api/items')
 
 const app = express();
 
-app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
 
 const db = require('./config/keys').mongoURI;
 
@@ -16,16 +18,6 @@ mongoose
   .catch(err => console.log(err));
 
 app.use('/api/items', items);
-
-// app.get('api/customers', (req, res) => {
-//   const customer = [
-//     {id: 1, firstName: 'John', lastName: 'Doe'},
-//     {id: 2, firstName: 'Jon', lastName: 'coe'},
-//     {id: 3, firstName: 'Jhn', lastName: 'Toe'},
-//   ];
-
-//   res.json(customers);
-// });
 
 const port = process.env.PORT || 5000;
 
