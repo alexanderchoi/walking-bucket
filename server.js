@@ -1,65 +1,3 @@
-// const express = require('express');
-// const mongoose = require('mongoose');
-// const bodyParser = require('body-parser');
-// const keys = require('./config/keys')
-// const passport = require('passport');
-// const session = require('express-session');
-// const LocalStrategy = require('passport-local');
-// const passportLocalMongoose = require('passport-local-mongoose');
-// const User = require('./models/user');
-
-// const app = express();
-
-// // Use BodyParser
-// app.use(bodyParser.urlencoded({ extended: true }));
-
-// // Passport
-// require('./passport')(passport);
-// app.use(passport.initialize());
-// app.use(passport.session());
-// app.use(session({
-//   secret: 'thesecret',
-//   saveUnitialized: false,
-//   resave: false
-// }));
-
-// var loggedIn = function(req, res, next) {
-//   if (req.isAuthenticated()) {
-//     next()
-//   } else {
-//     res.redirect('/login');
-//   }
-// }
-
-// // Connect to the Database
-// const db = keys.mongoURI
-// mongoose
-//   .connect(db, { useNewUrlParser: true })
-//   .then(() => console.log(`MongoDB connected...`))
-//   .catch(err => console.log(err));
-
-// // Routes
-// const items = require('./routes/api/items')
-// app.use('/api/items', items);
-
-// const auth = require('./routes/api/auth')(passport);
-// app.use('/auth', auth);
-
-// app.get('/profile', loggedIn, function(req, res, next) {
-//   res.send(req.session);
-// })
-
-// app.get('/logout', function(req, res, next) {
-//   req.logout();
-//   req.redirect('/login');
-// })
-
-// // Port and Listen
-// const port = process.env.PORT || 5000;
-// app.listen(port, () => console.log(`Server started on ${port}...`));
-
-
-
 const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
@@ -121,8 +59,36 @@ app.post('/login', passport.authenticate('local', {
 
 app.get('/logout', function(req, res) {
   req.logout();
-  res.redirect('/');
+  res.json({ success: false });
 })
+
+app.get('/secret', function(req, res) {
+  res.json()
+})
+
+function isLoggedIn(req, res, next) {
+  if (req.isAuthenticated()) {
+    return next;
+  }
+  res.redirect('/login');
+}
+
+
+
+
+app.get('/users', function(req, res, next) {
+  res.json([
+    {
+      id:1,
+      username: "samsepi01"
+    }, {
+      id: 2,
+      username: "D0loresH4ze"
+    }
+  ]);
+});
+
+
 
 // Port and Listen
 const port = process.env.PORT || 5000;
