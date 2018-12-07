@@ -7,6 +7,7 @@ const session = require('express-session');
 const LocalStrategy = require('passport-local');
 const passportLocalMongoose = require('passport-local-mongoose');
 const User = require('./models/User');
+const path = require('path');
 
 const app = express();
 
@@ -80,6 +81,16 @@ app.get('/api/secret', function(req, res) {
     res.json({ isLoggedIn: 'false' })
   }
 })
+
+// Serve static assets if in production
+if (process.env.NODE_ENV === 'production') {
+  // Set static folder
+  app.use(express.static('client/build'));
+
+  app.get('*', (req,res) => {
+    res.sendFile(path.resolve(__dirname, 'client', 'build', 'index.html'))
+  })
+}
 
 // Port and Listen
 const port = process.env.PORT || 5000;
