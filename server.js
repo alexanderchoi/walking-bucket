@@ -5,7 +5,7 @@ const keys = require('./config/keys')
 const passport = require('passport');
 const session = require('express-session');
 const LocalStrategy = require('passport-local');
-// const passportLocalMongoose = require('passport-local-mongoose');
+const passportLocalMongoose = require('passport-local-mongoose');
 const User = require('./models/User');
 
 const app = express();
@@ -14,14 +14,14 @@ const app = express();
 app.use(bodyParser.urlencoded({ extended: true }));
 
 // Passport
-app.use(passport.initialize());
-app.use(passport.session());
-
 app.use(session({
-  secret: 'Rusty is the best',
+  secret: 'secretySecret',
   saveUninitialized: false,
   resave: false
 }));
+
+app.use(passport.initialize());
+app.use(passport.session());
 
 passport.use(new LocalStrategy(User.authenticate()));
 passport.serializeUser(User.serializeUser());
@@ -40,55 +40,46 @@ app.use('/api/items', items);
 
 // Auth Routes
 app.post('/register', function(req, res) {
-  User.register(new User({ username: req.body.username }), req.body.password, function(err, user) {
-    if (err) {
-      console.log(err);
-      return res.render('/register');
+  var body = req.body,
+             username = body.username,
+             password = body.password;
+  User.findOne({ username: username }, function(err, document) {
+    if (err) { res.status(500).send('Error ocurred') }
+    else {
+      if (document) {
+        { res.status(500).send('Username already exists.') }
+      } else {
+        User.register(new User({ username: req.body.username }), req.body.password, function(err, user) {
+          if(err) {
+            console.log(err);
+          }
+          return res.redirect('/login');
+        })
+      }
     }
-    passport.authenticate('local')(req, res, function() {
-      res.redirect('/secret');
-    })
   })
-});
+})
 
 app.post('/login', passport.authenticate('local', {
-    successRedirect: '/secret',
-    failureRedirect: '/login'
-  }), function(req, res) {
+  failureRedirect: '/login',
+  successRedirect: '/secret'
+}), function(req, res) {
+  res.send('hey');
 });
 
-app.get('/logout', function(req, res) {
+// API Routes
+app.get('/api/logout', function(req, res) {
   req.logout();
-  res.json({ success: false });
+  res.json({ message: 'true facts' });
 })
 
-app.get('/secret', function(req, res) {
-  res.json()
-})
-
-function isLoggedIn(req, res, next) {
+app.get('/api/secret', function(req, res) {
   if (req.isAuthenticated()) {
-    return next;
+    res.json({ isLoggedIn: 'true' })
+  } else {
+    res.json({ isLoggedIn: 'false' })
   }
-  res.redirect('/login');
-}
-
-
-
-
-app.get('/users', function(req, res, next) {
-  res.json([
-    {
-      id:1,
-      username: "samsepi01"
-    }, {
-      id: 2,
-      username: "D0loresH4ze"
-    }
-  ]);
-});
-
-
+})
 
 // Port and Listen
 const port = process.env.PORT || 5000;
