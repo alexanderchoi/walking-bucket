@@ -12,6 +12,7 @@ const path = require('path');
 const app = express();
 
 // Use BodyParser
+app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({ extended: true }));
 
 // Passport
@@ -36,8 +37,8 @@ mongoose
   .catch(err => console.log(err));
 
 // Routes
-const items = require('./routes/api/items')
-app.use('/api/items', items);
+const logs = require('./routes/api/logs')
+app.use('/api/logs', logs);
 
 // Auth Routes
 app.post('/register', function(req, res) {
