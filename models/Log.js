@@ -2,6 +2,9 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
 const LogSchema = new Schema({
+  username: {
+    type: String
+  },
   shotType: {
     type: String,
     // required: true
